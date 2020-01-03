@@ -1,0 +1,7 @@
+.tools-list {
+    list-style: none;
+    display: block;
+    width: 70%;
+    box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
+    margin-bottom: 20%;
+}

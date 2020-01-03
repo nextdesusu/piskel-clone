@@ -1,0 +1,34 @@
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1%;
+    box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.header-wrapper {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-gap: 30px;
+    align-items: center;
+}
+
+.header-button {
+    max-width: 30px;
+}
+
+.header-line {
+    margin-bottom: 3px;
+    height: 2px;
+    width: 20px;
+    border-radius: 10px;
+    background-color: black;
+}
+
+.header-dots {
+    justify-self: flex-end;
+    font-size: 2em;
+    transform: rotate(90deg);
+    cursor: pointer;
+    line-height: 0;
+}
