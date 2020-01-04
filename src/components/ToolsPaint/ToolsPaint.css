@@ -5,3 +5,19 @@
     box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
     margin-bottom: 20%;
 }
+
+.color-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.color-picker {
+    width: 200px;
+    height: 200px;
+    border: 1px solid black;
+}
+
+.color-slider {
+    transform: rotate(90deg);
+}

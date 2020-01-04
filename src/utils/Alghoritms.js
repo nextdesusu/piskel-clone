@@ -1,5 +1,5 @@
 export function nonRecursiveFillBucket(changeColor, checkMethod, startX, startY, h, w) {
-    if (startY < 0 || startY > h - 1 || startX< 0 || startX > w - 1 || !checkMethod) return;
+    if (startY < 0 || startY > h - 1 || startX< 0 || startX > w - 1 || checkMethod(startX, startY)) return;
 
     const stack = [[startX, startY], ];
     while (stack.length > 0){

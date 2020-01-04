@@ -27,3 +27,6 @@ export const __SECRET_KEY__ = '56083d89080da80e8379fa049c565348644ca5bf54acfd110
 export const CHANGE_RESOLUTION = 'CHANGE_RESOLUTION';
 export const CHANGE_TOOL = 'CHANGE_TOOL';
 export const CHANGE_COLOR = 'CHANGE_COLOR';
+
+//Tech
+export const COLOR_PICKER_SIZE = 255;

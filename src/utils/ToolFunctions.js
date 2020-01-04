@@ -10,10 +10,8 @@ export function colorPickerTool (options) {
     } = options;
     const ctx = canvas.getContext('2d');
     const colorData = ctx.getImageData(X, Y, 1, 1).data;
-    const [ r, g, b, a ] = colorData;
-    const newColor = `rgba(${r}, ${g}, ${b}, ${a})`;
     function onEnd(event){
-        setColor(newColor);
+        setColor(colorData);
         canvas.removeEventListener('mouseup', onEnd);
     }
 
@@ -33,23 +31,34 @@ export function fillBucketTool(options){
     const ctx = canvas.getContext('2d');
     const startX = Math.ceil(X / pixelSize) - 1;
     const startY = Math.ceil(Y / pixelSize) - 1;
+    const calcH = height / pixelSize;
+    const calcW =  width / pixelSize;
+    const toChange = ctx.getImageData(startX, startY, 1, 1).data;
     ctx.fillStyle = color;
 
-    const toChange = ctx.getImageData(startX, startY, 1, 1).data;
-
     function checkMethod(x, y) {
-        const toCompare = ctx.getImageData(x, y, 1, 1).data;
+        const startX = x * pixelSize;
+        const startY = y * pixelSize;
+        const toCompare = ctx.getImageData(startX, startY, 1, 1).data;
         const [ r1, g1, b1, a1 ] = toCompare;
-        const [ r2, g2, b2, a2 ] = color;
-        return;
+        const [ r2, g2, b2, a2 ] = toChange;
+        const cond = !((r1 === r2) && (g1 === g2) && (b1 === b2) && (a1 === a2));
+        console.log('checkMethod');
+        console.log('toCompare:', '[', r1, g1, b1, a1, ']');
+        console.log('toChange:', '[', r2, g2, b2, a2, ']');
+        console.log('cond:', cond);
+        return cond;
     }
 
-    function changeColor(x, y) {
-        ctx.fillRect(x, y, 1, 1);
+    const colorSwapper = (x, y) => {
+        const startX = x * pixelSize;
+        const startY = y * pixelSize;
+        ctx.fillRect(startX, startY, pixelSize, pixelSize);
     }
 
     function onEnd(event){
-        nonRecursiveFillBucket(changeColor, checkMethod, startX, startY, height, width);
+        console.log(startX, startY, calcH, calcW)
+        nonRecursiveFillBucket(colorSwapper, checkMethod, startX, startY, calcH, calcW);
         canvas.removeEventListener('mouseup', onEnd);
     }
 

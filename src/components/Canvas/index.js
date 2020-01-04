@@ -3,6 +3,7 @@ import './Canvas.css';
 import { connect } from 'react-redux';
 import { SButton } from '../Elements'; 
 import UseTool from '../../utils/UseTool';
+import { extractColor } from '../../utils/ColorFunctions';
 
 import { changeColor } from '../../actions';
 
@@ -10,14 +11,28 @@ class Canvas extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
+            canvasRef: React.createRef(),
             width: 512,
-            height: 512
+            height: 512,
+            initialColor: 'gray',
         }
+    }
+
+    componentDidMount() {
+        const {
+            width,
+            height,
+            canvasRef,
+            initialColor,
+        } = this.state;
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = initialColor;
+        ctx.fillRect(0, 0, width, height);
     }
 
     getUseToolFunction = (event) => {
         const {
-            canvasRef,
             width,
             height,
         } = this.state;
@@ -31,15 +46,16 @@ class Canvas extends React.Component {
             offsetX,
             offsetY,
         } = event.nativeEvent;
-        console.log(width, resolution)
+        //console.log('res:', resolution)
         const canvas = event.target;
         const options = {
             canvas: canvas,
-            pixelSize: width / 128,
+            pixelSize: width / resolution,
             width: width,
             height: height,
             tool: currentTool,
-            color: currentColor,
+            color: extractColor(currentColor),
+            rawColor: currentColor,
             setColor: setColor,
             X: offsetX,
             Y: offsetY,
@@ -48,11 +64,16 @@ class Canvas extends React.Component {
     }
 
     render() {
-        const { width, height } = this.state;
+        const {
+            canvasRef,
+            width,
+            height
+        } = this.state;
         return (
             <section className="canvas-section">
                 <div className="canvas-wrapper">
                     <canvas
+                        ref={canvasRef}
                         onMouseDown={this.getUseToolFunction}
                         width={width}
                         height={height}
