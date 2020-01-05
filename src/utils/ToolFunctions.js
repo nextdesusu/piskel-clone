@@ -33,21 +33,28 @@ export function fillBucketTool(options){
     const startY = Math.ceil(Y / pixelSize) - 1;
     const calcH = height / pixelSize;
     const calcW =  width / pixelSize;
-    const toChange = ctx.getImageData(startX, startY, 1, 1).data;
+    const toChange = ctx.getImageData(X, Y, 1, 1).data;
     ctx.fillStyle = color;
 
-    function checkMethod(x, y) {
+    const isArrsEqual = (arr1, arr2) => {
+        const [ r1, g1, b1, a1 ] = arr1;
+        const [ r2, g2, b2, a2 ] = arr2;
+        return ((r1 === r2) && (g1 === g2) && (b1 === b2) && (a1 === a2));
+    }
+
+    const shouldPaint = (x, y) => {
         const startX = x * pixelSize;
         const startY = y * pixelSize;
         const toCompare = ctx.getImageData(startX, startY, 1, 1).data;
-        const [ r1, g1, b1, a1 ] = toCompare;
-        const [ r2, g2, b2, a2 ] = toChange;
-        const cond = !((r1 === r2) && (g1 === g2) && (b1 === b2) && (a1 === a2));
-        console.log('checkMethod');
+        /*
+        const cond = ;
+        console.log('shouldPaint:', cond);
+        console.log('input:', x, y);
+        console.log('dealed:', startX, startY);
         console.log('toCompare:', '[', r1, g1, b1, a1, ']');
         console.log('toChange:', '[', r2, g2, b2, a2, ']');
-        console.log('cond:', cond);
-        return cond;
+        */
+        return isArrsEqual(toChange, toCompare);
     }
 
     const colorSwapper = (x, y) => {
@@ -56,9 +63,9 @@ export function fillBucketTool(options){
         ctx.fillRect(startX, startY, pixelSize, pixelSize);
     }
 
-    function onEnd(event){
+    const onEnd = (event) => {
         console.log(startX, startY, calcH, calcW)
-        nonRecursiveFillBucket(colorSwapper, checkMethod, startX, startY, calcH, calcW);
+        nonRecursiveFillBucket(colorSwapper, shouldPaint, startX, startY, calcH, calcW);
         canvas.removeEventListener('mouseup', onEnd);
     }
 

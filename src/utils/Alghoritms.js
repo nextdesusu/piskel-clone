@@ -1,19 +1,34 @@
-export function nonRecursiveFillBucket(changeColor, checkMethod, startX, startY, h, w) {
-    if (startY < 0 || startY > h - 1 || startX< 0 || startX > w - 1 || checkMethod(startX, startY)) return;
-
+export function nonRecursiveFillBucket(paint, shouldPaint, startX, startY, h, w) {
+    if (startY < 0 || startY > h - 1 || startX< 0 || startX > w - 1 || !shouldPaint(startX, startY)) return;
+    const visited = new Set();
     const stack = [[startX, startY], ];
     while (stack.length > 0){
         let point = stack.pop();
         let [x, y] = point;
 
         if (y < 0 || y > h - 1 || x < 0 || x > w - 1) continue;
-
-        if (!checkMethod(x, y)){
-            changeColor(x, y)
-            stack.push([x + 1, y]);
-            stack.push([x - 1, y]);
-            stack.push([x, y + 1]);
-            stack.push([x, y - 1]);
+        if (shouldPaint(x, y)){
+            paint(x, y);
+            const p1 = [x + 1, y];
+            if (!visited.has(p1)) {
+                stack.push(p1);
+                visited.add(p1);
+            }
+            const p2 = [x, y + 1];
+            if (!visited.has(p2)){
+                stack.push(p2);
+                visited.add(p2);
+            }
+            const p3 = [x - 1, y];
+            if (!visited.has(p3)){
+                stack.push(p3);
+                visited.add(p3);
+            }
+            const p4 = [x, y - 1];
+            if (!visited.has(p4)){
+                stack.push(p4);
+                visited.add(p4);
+            }
         }
     }
 }
