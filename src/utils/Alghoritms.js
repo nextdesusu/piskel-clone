@@ -1,4 +1,4 @@
-export function nonRecursiveFillBucket(paint, shouldPaint, startX, startY, h, w) {
+export function nonRecursiveFillBucketOld(paint, shouldPaint, startX, startY, h, w) {
     if (startY < 0 || startY > h - 1 || startX< 0 || startX > w - 1 || !shouldPaint(startX, startY)) return;
     const visited = new Set();
     const stack = [[startX, startY], ];
@@ -30,6 +30,21 @@ export function nonRecursiveFillBucket(paint, shouldPaint, startX, startY, h, w)
                 visited.add(p4);
             }
         }
+    }
+}
+
+export function nonRecursiveFillBucket(paint, shouldPaint, startX, startY, h, w) {
+    if (startY < 0 || startY > h - 1 || startX< 0 || startX > w - 1 || !shouldPaint(startX, startY)) return;
+    const stack = [[startX, startY], ];
+    while (stack.length > 0){
+        const point = stack.pop();
+        const [x, y] = point;
+        paint(x, y);
+        if (y < 0 || y > h - 1 || x < 0 || x > w - 1) continue;
+        if (shouldPaint(x + 1, y)) stack.push([x + 1, y]);
+        if (shouldPaint(x, y + 1)) stack.push([x, y + 1]);
+        if (shouldPaint(x - 1, y)) stack.push([x - 1, y]);
+        if (shouldPaint(x, y - 1)) stack.push([x, y - 1]);
     }
 }
 

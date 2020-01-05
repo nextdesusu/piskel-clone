@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { SButton } from '../Elements'; 
 import UseTool from '../../utils/UseTool';
 import { extractColor } from '../../utils/ColorFunctions';
+import Frame from '../Frame';
 
 import { changeColor } from '../../actions';
 
@@ -15,7 +16,14 @@ class Canvas extends React.Component {
             width: 512,
             height: 512,
             initialColor: 'gray',
+            frames: [],
         }
+    }
+
+    addFrame = () => {
+        const frames = this.state.frames;
+        const newFrame = <Frame />;
+        this.setState({ frames: [...frames, newFrame]});
     }
 
     componentDidMount() {
@@ -67,7 +75,8 @@ class Canvas extends React.Component {
         const {
             canvasRef,
             width,
-            height
+            height,
+            frames
         } = this.state;
         return (
             <section className="canvas-section">
@@ -80,6 +89,12 @@ class Canvas extends React.Component {
                         className='canvas'>
                     </canvas>
                 </div>
+                <SButton text='add frame' onClick={this.addFrame}/>
+                <ul>
+                    {
+                        frames.map((frame) => <li>{frame}</li>)
+                    }
+                </ul>
             </section>
         )
     }
