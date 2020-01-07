@@ -1,13 +1,19 @@
 import React from 'react';
 import './ToolsPaint.css';
 import { ToolsItem, ColorItem } from '../Items';
-import { COLORS } from '../../consts';
 import { connect } from 'react-redux';
 import {
     changeTool,
     changeColor,
 } from '../../actions';
-import { COLOR_PICKER_SIZE } from '../../consts'
+import {
+    COLOR_PICKER_SIZE,
+    BUCKET_TOOL,
+    COLOR_PICKER_TOOL,
+    PENCIL_TOOL,
+    STROKE_TOOL,
+    ERASE_TOOL,
+} from '../../consts'
 import { extractColor } from '../../utils/ColorFunctions';
 
 import BucketIcon from '../../images/bucket.svg';
@@ -23,20 +29,22 @@ class ToolsPaint extends React.Component {
         }
     }
 
-    drawColors(blueMixin) {
+    drawColors(hue) {
         const {
             colorPickerSize,
             colorPickerRef,
         } = this.state;
         const colorPicker = colorPickerRef.current;
         const ctx = colorPicker.getContext('2d');
+        const maxHslValue = 100;
         colorPicker.width = colorPickerSize;
         colorPicker.height = colorPickerSize;
-        for (let x = 0; x < colorPickerSize; x += 1) {
-            for (let y = 0; y < colorPickerSize; y += 1) {
-                ctx.fillStyle = `rgb(${x}, ${y}, ${blueMixin})`;
-                ctx.fillRect(x, y, 1, 1);
-            }
+        for(let row = 0; row < colorPickerSize; row += 1){
+            const grad = ctx.createLinearGradient(0, 0, colorPickerSize, colorPickerSize);
+            grad.addColorStop(0, `hsl(${hue}, 100%, ${row / colorPickerSize * maxHslValue}%)`);
+            grad.addColorStop(1, `hsl(${hue}, 0%, ${row / colorPickerSize * maxHslValue}%)`);
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, row, colorPickerSize, 1);
         }
     }
 
@@ -64,41 +72,81 @@ class ToolsPaint extends React.Component {
         //console.log('color', color);
     }
 
+    get ToolsItems() {
+        const { setTool } = this.props;
+        return [
+            {
+                id: BUCKET_TOOL,
+                onClick: () => setTool(BUCKET_TOOL),
+                text: 'bucket',
+                iconSrc: BucketIcon,
+            },
+            {
+                id: COLOR_PICKER_TOOL,
+                onClick: () => setTool(COLOR_PICKER_TOOL),
+                text: 'color picker',
+                iconSrc: ColorPickerIcon,
+            },
+            {
+                id: PENCIL_TOOL,
+                onClick: () => setTool(PENCIL_TOOL),
+                text: 'pencil',
+                iconSrc: PencilIcon,
+            },
+            {
+                id: STROKE_TOOL,
+                onClick: () => setTool(STROKE_TOOL),
+                text: 'stroke',
+                iconSrc: null,
+            },
+            {
+                id: ERASE_TOOL,
+                onClick: () => setTool(ERASE_TOOL),
+                text: 'erase',
+                iconSrc: null,
+            }
+        ];
+    }
+
     render(){
+        const {
+            props,
+            state,
+            ToolsItems
+        } = this;
         const {
             currentColor,
             previousColor,
-            setTool,
+            currentTool,
             setColor
-        } = this.props;
+        } = props;
         const {
             colorPickerRef
-        } = this.state;
+        } = state;
         const extractedCurrent = extractColor(currentColor);
         const extractedPrevious = extractColor(previousColor);
         return (
             <section className="tools">
                 <h2>Painting tools</h2>
                 <ul className="tools-list" id="tools_list">
-                    <ToolsItem
-                        onClick={() => {setTool(0)}}
-                        text='bucket' iconSrc={BucketIcon}
-                    />
-                    <ToolsItem
-                        onClick={() => {setTool(1)}}
-                        text='color picker'
-                        iconSrc={ColorPickerIcon}
-                    />
-                    <ToolsItem
-                        onClick={() => {setTool(2)}}
-                        text='pencil'
-                        iconSrc={PencilIcon}
-                    />
-                    <ToolsItem
-                        onClick={() => {setTool(3)}}
-                        text='stroke'
-                        iconSrc={null}
-                    />
+                    {
+                        ToolsItems.map((item, key) => {
+                            const {
+                                id,
+                                onClick,
+                                text,
+                                iconSrc,
+                            } = item;
+                            const highlighted = id === currentTool
+                            return <ToolsItem
+                                key={key}
+                                onClick={onClick}
+                                text={text}
+                                iconSrc={iconSrc}
+                                highlighted={highlighted}
+                            />
+                        })
+                    }
                 </ul>
                 <ul className="tools-list" id="colors_list">
                     <ColorItem onClick={() => {}} text='current color' colorName={extractedCurrent}/>
@@ -128,6 +176,7 @@ class ToolsPaint extends React.Component {
 
 const mapStateToProps = store => {
     return {
+        currentTool: store.currentTool,
         currentColor: store.currentColor,
         previousColor: store.previousColor,
     }

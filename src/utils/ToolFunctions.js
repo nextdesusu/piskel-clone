@@ -1,5 +1,4 @@
 import { nonRecursiveFillBucket, bresenhamAlgorithm } from './Alghoritms';
-import { extractColor } from './ColorFunctions';
 
 export function colorPickerTool (options) {
     const {
@@ -138,4 +137,42 @@ export function strokeTool(options) {
     }
 
     canvas.addEventListener('mouseup', onEnd);
+}
+
+export function eraseTool(options) {
+    const {
+        canvas,
+        pixelSize,
+        color,
+        X,
+        Y
+    } = options;
+
+    const ctx = canvas.getContext('2d');
+    const lineStartX = Math.ceil(X / pixelSize) - 1;
+    const lineStartY = Math.ceil(Y / pixelSize) - 1;
+    ctx.fillStyle = color;
+
+    const colorErase = (x, y) => {
+        const startX = x * pixelSize;
+        const startY = y * pixelSize;
+        ctx.clearRect(startX, startY, pixelSize, pixelSize);
+    }
+
+    const eraser = (event) => {
+        const eventEndX = event.offsetX;
+        const eventEndY = event.offsetY;
+        const lineEndX = Math.ceil(eventEndX / pixelSize) - 1;
+        const lineEndY = Math.ceil(eventEndY / pixelSize) - 1;
+        colorErase(lineEndX, lineEndY);
+    }
+
+    const onEnd = (event) => {
+        canvas.removeEventListener('mousemove', eraser);
+        canvas.removeEventListener('mouseup', onEnd);
+    }
+
+    canvas.addEventListener('mousemove', eraser);
+    canvas.addEventListener('mouseup', onEnd);
+    colorErase(lineStartX, lineStartY);
 }

@@ -6,6 +6,7 @@ import {
 
 const OBJECT_TYPE = 'object';
 const NUMBER_TYPE = 'number';
+const STRING_TYPE = 'string';
 
 const requiredType = (funcName, type, target) => {
     if (typeof target !== type) {
@@ -21,11 +22,11 @@ export function changeResolution(newRes) {
     }
 }
 
-export function changeTool(toolId) {
-    requiredType('changeTool', NUMBER_TYPE, toolId);
+export function changeTool(tool) {
+    requiredType('changeTool', STRING_TYPE, tool);
     return {
         type: CHANGE_TOOL,
-        payload: toolId,
+        payload: tool,
     }
 }
 

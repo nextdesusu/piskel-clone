@@ -4,9 +4,14 @@ import './Items.css';
 
 
 export function ToolsItem(props){
-    const { onClick, text, iconSrc } = props;
+    const {
+        onClick,
+        text,
+        iconSrc,
+        highlighted,
+    } = props;
     return (
-        <li onClick={onClick} className='tools-item'>
+        <li onClick={onClick} className={`tools-item ${highlighted ? 'tools-item-highlighted' : ''}`}>
             <img src={iconSrc} alt='' className='tools-icon--picture'></img>
             <p className='tools-text'>{text}</p>
         </li>
@@ -14,7 +19,11 @@ export function ToolsItem(props){
 }
 
 export function ColorItem(props){
-    const { text, colorName, onClick } = props;
+    const {
+        text,
+        colorName,
+        onClick
+    } = props;
     const colorStyle = {
         backgroundColor: colorName,
     }

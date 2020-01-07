@@ -1,0 +1,14 @@
+.context-menu {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    background-color: red;
+}
+
+.context-menu-item {
+
+}
+
+.context-menu-hidden {
+    display: none;
+}

@@ -6,7 +6,7 @@ import {
 
 const initialState = {
     resolution: 0,
-    currentTool: 0,
+    currentTool: '',
     currentColor: new Uint8Array(4),
     previousColor: new Uint8Array(4),
 };

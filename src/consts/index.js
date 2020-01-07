@@ -1,26 +1,12 @@
 export const SCREEN_SIZE = 512;
 export const SCREEN_SIZE_MAX = 512;
 export const VISIBLE = 'visible_block';
-export const COLORS = [
-    'white',
-    'black',
-    'red',
-    'yellow',
-    'green',
-    'blue',
-    'orange',
-    'purple'
-];
-export const TOOLS = [
-    'fill bucket',
-    'pencil',
-    'color picker'
-];
-
-export const BUCKET_TOOL = 'bucket';
-export const COLOR_PICKER_TOOL = 'color picker';
-export const PENCIL_TOOL = 'pencil';
-export const STROKE_TOOL = 'stroke';
+//Tools
+export const BUCKET_TOOL = 'BUCKET_TOOL';
+export const COLOR_PICKER_TOOL = 'COLOR_PICKER_TOOL';
+export const PENCIL_TOOL = 'PENCIL_TOOL';
+export const STROKE_TOOL = 'STROKE_TOOL';
+export const ERASE_TOOL = 'ERASE_TOOL';
 export const __SECRET_KEY__ = '56083d89080da80e8379fa049c565348644ca5bf54acfd110187ec1744dea781';
 
 //Action types

@@ -5,6 +5,7 @@ import { SButton } from '../Elements';
 import UseTool from '../../utils/UseTool';
 import { extractColor } from '../../utils/ColorFunctions';
 import Frame from '../Frame';
+import ContextMenu from '../ContextMenu';
 
 import { changeColor } from '../../actions';
 
@@ -15,15 +16,93 @@ class Canvas extends React.Component {
             canvasRef: React.createRef(),
             width: 512,
             height: 512,
-            initialColor: 'gray',
-            frames: [],
+            fps: 30,
+            contextMenuProps: {
+                options: [],
+                posX: 0,
+                posY: 0,
+                displayCM: false,
+            },
+            framesProps: [],
         }
     }
 
+    fillCanvas = (data) => {
+        const {
+            canvasRef,
+        } = this.state;
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        ctx.putImageData(data, 0, 0);
+    }
+
     addFrame = () => {
-        const frames = this.state.frames;
-        const newFrame = <Frame />;
-        this.setState({ frames: [...frames, newFrame]});
+        const framesProps = this.state.framesProps;
+        const id = framesProps.length;
+        const {
+            canvasRef,
+            width,
+            height
+        } = this.state;
+        const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
+        const data = ctx.getImageData(0, 0, width, height);
+        const newFrame = {id, data};
+        this.setState({ framesProps: [...framesProps, newFrame] });
+    }
+
+    drawData = (event) => {
+        const target = event.target;
+        const id = Number(target.getAttribute('data-id'));
+        const frame = this.state.framesProps[id];
+        const { data } = frame.props;
+        this.fillCanvas(data);
+    }
+
+    showContextMenu = (event) => {
+        event.preventDefault();
+        const {
+            pageX,
+            pageY,
+        } = event
+        const contextMenuProps = {
+            options: [
+                {
+                    text: 'delete frame',
+                    onClick: () => console.log('clicked'),
+                },
+            ],
+            posX: pageX,
+            posY: pageY,
+            displayCM: true,
+        }
+        this.setState({ contextMenuProps });
+    }
+
+    animate = () => {
+        const {
+            fillCanvas,
+            state,
+        } = this;
+        const {
+            framesProps,
+            fps,
+        } = state;
+        let currentFrame = 0;
+        const time = 1000 / fps;
+        const animId = setInterval(() => {
+            const frame = framesProps[currentFrame];
+            const { data } = frame;
+            fillCanvas(data);
+            currentFrame += 1;
+            if (currentFrame === framesProps.length) clearInterval(animId);
+        }, time);
+    }
+
+    deleteLast = () => {
+        const framesProps = this.state.framesProps;
+        const newFrames = framesProps.slice(0, framesProps.length - 1);
+        this.setState({ framesProps: newFrames });
     }
 
     componentDidMount() {
@@ -31,12 +110,10 @@ class Canvas extends React.Component {
             width,
             height,
             canvasRef,
-            initialColor,
         } = this.state;
         const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = initialColor;
-        ctx.fillRect(0, 0, width, height);
+        canvas.width = width;
+        canvas.height = height;
     }
 
     getUseToolFunction = (event) => {
@@ -54,7 +131,6 @@ class Canvas extends React.Component {
             offsetX,
             offsetY,
         } = event.nativeEvent;
-        //console.log('res:', resolution)
         const canvas = event.target;
         const options = {
             canvas: canvas,
@@ -73,11 +149,25 @@ class Canvas extends React.Component {
 
     render() {
         const {
+            state,
+            showContextMenu,
+            animate,
+            deleteLast,
+            addFrame,
+        } = this;
+        const {
             canvasRef,
             width,
             height,
-            frames
-        } = this.state;
+            contextMenuProps,
+            framesProps,
+        } = state;
+        const {
+            options,
+            posX,
+            posY,
+            displayCM
+        } = contextMenuProps;
         return (
             <section className="canvas-section">
                 <div className="canvas-wrapper">
@@ -89,12 +179,23 @@ class Canvas extends React.Component {
                         className='canvas'>
                     </canvas>
                 </div>
-                <SButton text='add frame' onClick={this.addFrame}/>
-                <ul>
+                <SButton text='add frame' onClick={addFrame}/>
+                <SButton text='delete last' onClick={deleteLast} />
+                <SButton text='animate' onClick={animate} />
+                <div onContextMenu={showContextMenu}>
                     {
-                        frames.map((frame) => <li>{frame}</li>)
+                        displayCM ? <ContextMenu options={options} posX={posX} posY={posY} /> : null
                     }
-                </ul>
+                    {
+                        framesProps.map((frameData, key) => {
+                            const {
+                                text,
+                                data
+                            } = frameData;
+                            return <Frame key={key} text={text} data={data} />
+                        })
+                    }
+                </div>
             </section>
         )
     }

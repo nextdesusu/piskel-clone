@@ -1,7 +1,6 @@
 .tools-item {
     user-select: none;
     text-transform: capitalize;
-    padding: 5% 0 5% 0;
     margin: 0 3em 0 3em;
     cursor: pointer;
     display: grid;
@@ -9,9 +8,10 @@
     grid-gap: 0.3em;
     justify-content: flex-start;
     align-items: center;
+    padding: 1em;
 }
 
-.tools-item:hover {
+.tools-item-highlighted, .tools-item:hover {
     text-decoration: underline;
 }
 
