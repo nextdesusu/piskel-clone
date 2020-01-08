@@ -6,6 +6,7 @@ import UseTool from '../../utils/UseTool';
 import { extractColor } from '../../utils/ColorFunctions';
 import Frame from '../Frame';
 import ContextMenu from '../ContextMenu';
+import GIF from 'gif.js-upgrade';
 
 import { changeColor } from '../../actions';
 
@@ -16,15 +17,22 @@ class Canvas extends React.Component {
             canvasRef: React.createRef(),
             width: 512,
             height: 512,
-            fps: 30,
+            fps: 1,
             contextMenuProps: {
                 options: [],
                 posX: 0,
                 posY: 0,
                 displayCM: false,
             },
+            downLoadLink: null,
             framesProps: [],
         }
+    }
+
+    get MS() {
+        const FPS = this.state.fps;
+        const ms = 100;
+        return Math.floor(ms / FPS);
     }
 
     fillCanvas = (data) => {
@@ -47,20 +55,74 @@ class Canvas extends React.Component {
         const canvas = canvasRef.current;
         const ctx = canvas.getContext('2d');
         const data = ctx.getImageData(0, 0, width, height);
-        const newFrame = {id, data};
+        const frameRef = React.createRef();
+        const newFrame = {
+            id,
+            data,
+            frameRef,
+        };
         this.setState({ framesProps: [...framesProps, newFrame] });
     }
 
-    drawData = (event) => {
-        const target = event.target;
-        const id = Number(target.getAttribute('data-id'));
-        const frame = this.state.framesProps[id];
-        const { data } = frame.props;
-        this.fillCanvas(data);
+    createGif = () => {
+        const {
+            MS,
+            state,
+        } = this;
+        const {
+            framesProps,
+            fps,
+        } = state;
+        const gif = new GIF({
+            workers: 2,
+            quality: 10,
+            debug: true,
+            delay: MS,
+            width: 512,
+            height: 512,
+            workerScript: './gif.worker.js',
+        });
+        for (let frameProp of framesProps) {
+            const frame = frameProp.frameRef.current;
+            gif.addFrame(frame);
+        }
+        
+        gif.on('finished', (blob) => {
+            //window.open(URL.createObjectURL(blob), 'blank');
+            const obj = URL.createObjectURL(blob);
+            this.setState({
+                downLoadLink: <a href={obj} download={obj}>download!</a>
+            })
+        });
+
+        gif.render();
+    }
+
+    drawData = (frameId) => {
+        const {
+            fillCanvas,
+            state,
+        } = this;
+        const frame = state.framesProps[frameId];
+        const { data } = frame;
+        fillCanvas(data);
+    }
+
+    deleteFrame = (frameId) => {
+        console.log('deleteing frameid', frameId);
+        const framesProps = this.state.framesProps;
+        const newData = framesProps.filter((frame) => frame.id !== frameId);
+        this.setState({ framesProps: newData });
     }
 
     showContextMenu = (event) => {
         event.preventDefault();
+        const id = Number(event.target.getAttribute('data-id'));
+        const {
+            deleteFrame,
+            drawData,
+        } = this;
+        if (id === null) return;
         const {
             pageX,
             pageY,
@@ -68,8 +130,12 @@ class Canvas extends React.Component {
         const contextMenuProps = {
             options: [
                 {
+                    text: 'redact',   
+                    onClick: () => drawData(id),
+                },
+                {
                     text: 'delete frame',
-                    onClick: () => console.log('clicked'),
+                    onClick: () => deleteFrame(id),
                 },
             ],
             posX: pageX,
@@ -83,26 +149,19 @@ class Canvas extends React.Component {
         const {
             fillCanvas,
             state,
+            MS,
         } = this;
         const {
-            framesProps,
-            fps,
+            framesProps
         } = state;
         let currentFrame = 0;
-        const time = 1000 / fps;
         const animId = setInterval(() => {
             const frame = framesProps[currentFrame];
             const { data } = frame;
             fillCanvas(data);
             currentFrame += 1;
             if (currentFrame === framesProps.length) clearInterval(animId);
-        }, time);
-    }
-
-    deleteLast = () => {
-        const framesProps = this.state.framesProps;
-        const newFrames = framesProps.slice(0, framesProps.length - 1);
-        this.setState({ framesProps: newFrames });
+        }, MS);
     }
 
     componentDidMount() {
@@ -154,6 +213,8 @@ class Canvas extends React.Component {
             animate,
             deleteLast,
             addFrame,
+            createGif,
+            getUseToolFunction,
         } = this;
         const {
             canvasRef,
@@ -161,6 +222,7 @@ class Canvas extends React.Component {
             height,
             contextMenuProps,
             framesProps,
+            downLoadLink
         } = state;
         const {
             options,
@@ -173,15 +235,16 @@ class Canvas extends React.Component {
                 <div className="canvas-wrapper">
                     <canvas
                         ref={canvasRef}
-                        onMouseDown={this.getUseToolFunction}
+                        onMouseDown={getUseToolFunction}
                         width={width}
                         height={height}
                         className='canvas'>
                     </canvas>
                 </div>
                 <SButton text='add frame' onClick={addFrame}/>
-                <SButton text='delete last' onClick={deleteLast} />
                 <SButton text='animate' onClick={animate} />
+                <SButton text='download gif' onClick={createGif} />
+                {downLoadLink ? downLoadLink : null}
                 <div onContextMenu={showContextMenu}>
                     {
                         displayCM ? <ContextMenu options={options} posX={posX} posY={posY} /> : null
@@ -190,9 +253,19 @@ class Canvas extends React.Component {
                         framesProps.map((frameData, key) => {
                             const {
                                 text,
-                                data
+                                data,
+                                id,
+                                frameRef,
                             } = frameData;
-                            return <Frame key={key} text={text} data={data} />
+                            return <Frame
+                                id={id}
+                                key={key}
+                                text={text}
+                                data={data}
+                                frameRef={frameRef}
+                                width={512}
+                                height={512}
+                                />
                         })
                     }
                 </div>

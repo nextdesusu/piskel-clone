@@ -163,7 +163,7 @@ class ToolsPaint extends React.Component {
                         className='color-slider'
                         onMouseUp={this.silderOnChange}
                         min='0'
-                        max='255'
+                        max='359'
                         step='1'
                         type='range'
                     >    
