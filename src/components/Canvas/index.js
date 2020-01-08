@@ -71,7 +71,6 @@ class Canvas extends React.Component {
         } = this;
         const {
             framesProps,
-            fps,
         } = state;
         const gif = new GIF({
             workers: 2,
@@ -86,7 +85,6 @@ class Canvas extends React.Component {
             const frame = frameProp.frameRef.current;
             gif.addFrame(frame);
         }
-        
         gif.on('finished', (blob) => {
             //window.open(URL.createObjectURL(blob), 'blank');
             const obj = URL.createObjectURL(blob);
@@ -94,7 +92,6 @@ class Canvas extends React.Component {
                 downLoadLink: <a href={obj} download={obj}>download!</a>
             })
         });
-
         gif.render();
     }
 
@@ -109,10 +106,17 @@ class Canvas extends React.Component {
     }
 
     deleteFrame = (frameId) => {
-        console.log('deleteing frameid', frameId);
         const framesProps = this.state.framesProps;
         const newData = framesProps.filter((frame) => frame.id !== frameId);
         this.setState({ framesProps: newData });
+    }
+
+    duplicateFrame = (frameId) => {
+        const framesProps = this.state.framesProps;
+        const frame = framesProps[frameId];
+        const leftPart = framesProps.slice(0, frameId);
+        const rightPart = framesProps.slice(frameId, framesProps.length);
+        this.setState({ framesProps: [...leftPart, frame, ...rightPart] });
     }
 
     showContextMenu = (event) => {
@@ -121,6 +125,7 @@ class Canvas extends React.Component {
         const {
             deleteFrame,
             drawData,
+            duplicateFrame,
         } = this;
         if (id === null) return;
         const {
@@ -134,9 +139,13 @@ class Canvas extends React.Component {
                     onClick: () => drawData(id),
                 },
                 {
-                    text: 'delete frame',
+                    text: 'delete',
                     onClick: () => deleteFrame(id),
                 },
+                {
+                    text: 'duplicate',
+                    onClick: () => duplicateFrame(id),
+                }
             ],
             posX: pageX,
             posY: pageY,
@@ -191,9 +200,12 @@ class Canvas extends React.Component {
             offsetY,
         } = event.nativeEvent;
         const canvas = event.target;
+        const pixelSizeX = Math.floor(width / resolution.width);
+        const pixelSizeY = Math.floor(height / resolution.height);
         const options = {
             canvas: canvas,
-            pixelSize: width / resolution,
+            pixelSizeX: pixelSizeX,
+            pixelSizeY: pixelSizeY,
             width: width,
             height: height,
             tool: currentTool,
@@ -231,8 +243,8 @@ class Canvas extends React.Component {
             displayCM
         } = contextMenuProps;
         return (
-            <section className="canvas-section">
-                <div className="canvas-wrapper">
+            <section className='canvas-section'>
+                <div className='canvas-wrapper'>
                     <canvas
                         ref={canvasRef}
                         onMouseDown={getUseToolFunction}

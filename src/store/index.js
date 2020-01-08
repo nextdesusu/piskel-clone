@@ -1,17 +1,37 @@
-import { createStore } from "redux";
-import rootReducer from "../reducers/index";
-import { loadState, saveState } from '../localStorage';
+import { createStore } from 'redux';
+import rootReducer from '../reducers/index';
+import { PENCIL_TOOL } from '../consts';
+import {
+    loadState,
+    saveState,
+} from '../localStorage';
 
-const persistedState = loadState();
-console.log('starting with state:', persistedState);
+const persistedState = loadState() || {};
+
+const initialState = {
+    resolution: {
+        width: 4,
+        height: 4,
+    },
+    currentTool: PENCIL_TOOL,
+    currentColor: [0, 0, 0, 255],
+    previousColor: [255, 255, 255, 255],
+};
+
+const finalStore = {
+    ...initialState,
+    ...persistedState,
+};
+
+console.log('starting width store', finalStore)
+
 const store = createStore(
     rootReducer,
-    persistedState
+    finalStore,
 );
 
 store.subscribe(() => {
     const newState = store.getState();
-    //console.log('saving state!', newState);
     saveState(newState);
 })
 

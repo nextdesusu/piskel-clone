@@ -4,14 +4,7 @@ import {
     CHANGE_COLOR
 } from '../consts';
 
-const initialState = {
-    resolution: 0,
-    currentTool: '',
-    currentColor: new Uint8Array(4),
-    previousColor: new Uint8Array(4),
-};
-
-export default function rootReducer(state = initialState, action) {
+export default function rootReducer(state, action) {
     switch(action.type) {
         case CHANGE_RESOLUTION:
             return { ...state, resolution: action.payload };

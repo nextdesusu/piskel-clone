@@ -4,26 +4,17 @@ import {
     CHANGE_COLOR,
 } from '../consts';
 
-const OBJECT_TYPE = 'object';
-const NUMBER_TYPE = 'number';
-const STRING_TYPE = 'string';
-
-const requiredType = (funcName, type, target) => {
-    if (typeof target !== type) {
-        throw Error(`${funcName}: type have to be ${type}, instead got: ${typeof target}`);
-    }
-}
-
-export function changeResolution(newRes) {
-    requiredType('changeResolution', NUMBER_TYPE, newRes);
+export function changeResolution(newW, newH) {
     return {
         type: CHANGE_RESOLUTION,
-        payload: newRes,
+        payload: {
+            width: newW,
+            height: newH,
+        },
     }
 }
 
 export function changeTool(tool) {
-    requiredType('changeTool', STRING_TYPE, tool);
     return {
         type: CHANGE_TOOL,
         payload: tool,
@@ -31,7 +22,6 @@ export function changeTool(tool) {
 }
 
 export function changeColor(newColor) {
-    requiredType('changeColor', OBJECT_TYPE, newColor);
     return {
         type: CHANGE_COLOR,
         payload: Array.from(newColor),

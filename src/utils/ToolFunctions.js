@@ -20,7 +20,8 @@ export function colorPickerTool (options) {
 export function fillBucketTool(options){
     const {
         canvas,
-        pixelSize,
+        pixelSizeX,
+        pixelSizeY,
         color,
         width,
         height,
@@ -28,10 +29,10 @@ export function fillBucketTool(options){
         Y
     } = options;
     const ctx = canvas.getContext('2d');
-    const startX = Math.ceil(X / pixelSize) - 1;
-    const startY = Math.ceil(Y / pixelSize) - 1;
-    const calcH = height / pixelSize;
-    const calcW =  width / pixelSize;
+    const startX = Math.ceil(X / pixelSizeX) - 1;
+    const startY = Math.ceil(Y / pixelSizeY) - 1;
+    const calcW =  width / pixelSizeX;
+    const calcH = height / pixelSizeY;
     const toChange = ctx.getImageData(X, Y, 1, 1).data;
     ctx.fillStyle = color;
 
@@ -42,28 +43,19 @@ export function fillBucketTool(options){
     }
 
     const shouldPaint = (x, y) => {
-        const startX = x * pixelSize;
-        const startY = y * pixelSize;
+        const startX = x * pixelSizeX;
+        const startY = y * pixelSizeY;
         const toCompare = ctx.getImageData(startX, startY, 1, 1).data;
-        /*
-        const cond = ;
-        console.log('shouldPaint:', cond);
-        console.log('input:', x, y);
-        console.log('dealed:', startX, startY);
-        console.log('toCompare:', '[', r1, g1, b1, a1, ']');
-        console.log('toChange:', '[', r2, g2, b2, a2, ']');
-        */
         return isArrsEqual(toChange, toCompare);
     }
 
     const colorSwapper = (x, y) => {
-        const startX = x * pixelSize;
-        const startY = y * pixelSize;
-        ctx.fillRect(startX, startY, pixelSize, pixelSize);
+        const startX = x * pixelSizeX;
+        const startY = y * pixelSizeY;
+        ctx.fillRect(startX, startY, pixelSizeX, pixelSizeY);
     }
 
     const onEnd = (event) => {
-        console.log(startX, startY, calcH, calcW)
         nonRecursiveFillBucket(colorSwapper, shouldPaint, startX, startY, calcH, calcW);
         canvas.removeEventListener('mouseup', onEnd);
     }
@@ -74,28 +66,28 @@ export function fillBucketTool(options){
 export function pencilTool(options) {
     const {
         canvas,
-        pixelSize,
+        pixelSizeX,
+        pixelSizeY,
         color,
         X,
         Y
     } = options;
-
     const ctx = canvas.getContext('2d');
-    const lineStartX = Math.ceil(X / pixelSize) - 1;
-    const lineStartY = Math.ceil(Y / pixelSize) - 1;
+    const lineStartX = Math.ceil(X / pixelSizeX) - 1;
+    const lineStartY = Math.ceil(Y / pixelSizeY) - 1;
     ctx.fillStyle = color;
 
     const colorSwapper = (x, y) => {
-        const startX = x * pixelSize;
-        const startY = y * pixelSize;
-        ctx.fillRect(startX, startY, pixelSize, pixelSize);
+        const startX = x * pixelSizeX;
+        const startY = y * pixelSizeY;
+        ctx.fillRect(startX, startY, pixelSizeX, pixelSizeY);
     }
 
     const swapColor = (event) => {
         const eventEndX = event.offsetX;
         const eventEndY = event.offsetY;
-        const lineEndX = Math.ceil(eventEndX / pixelSize) - 1;
-        const lineEndY = Math.ceil(eventEndY / pixelSize) - 1;
+        const lineEndX = Math.ceil(eventEndX / pixelSizeX) - 1;
+        const lineEndY = Math.ceil(eventEndY / pixelSizeY) - 1;
         colorSwapper(lineEndX, lineEndY);
     }
 
@@ -112,26 +104,28 @@ export function pencilTool(options) {
 export function strokeTool(options) {
     const {
         canvas,
-        pixelSize,
+        pixelSizeX,
+        pixelSizeY,
         color,
         X,
         Y
     } = options;
     const ctx = canvas.getContext('2d');
-    const lineStartX = Math.ceil(X / pixelSize) - 1;
-    const lineStartY = Math.ceil(Y / pixelSize) - 1;
+    const lineStartX = Math.ceil(X / pixelSizeX) - 1;
+    const lineStartY = Math.ceil(Y / pixelSizeY) - 1;
     ctx.fillStyle = color;
 
     const colorSwapper = (x, y) => {
-        let startX = x * pixelSize, startY = y * pixelSize;
-        ctx.fillRect(startX, startY, pixelSize, pixelSize);
+        const startX = x * pixelSizeX;
+        const startY = y * pixelSizeY;
+        ctx.fillRect(startX, startY, pixelSizeX, pixelSizeY);
     }
 
     const onEnd = (event) => {
         const eventEndX = event.offsetX;
         const eventEndY = event.offsetY;
-        const lineEndX = Math.ceil(eventEndX / pixelSize) - 1;
-        const lineEndY = Math.ceil(eventEndY / pixelSize) - 1;
+        const lineEndX = Math.ceil(eventEndX / pixelSizeX) - 1;
+        const lineEndY = Math.ceil(eventEndY / pixelSizeY) - 1;
         bresenhamAlgorithm(colorSwapper, lineStartX, lineStartY, lineEndX, lineEndY);
         canvas.removeEventListener('mouseup', onEnd);
     }
@@ -142,28 +136,29 @@ export function strokeTool(options) {
 export function eraseTool(options) {
     const {
         canvas,
-        pixelSize,
+        pixelSizeX,
+        pixelSizeY,
         color,
         X,
         Y
     } = options;
 
     const ctx = canvas.getContext('2d');
-    const lineStartX = Math.ceil(X / pixelSize) - 1;
-    const lineStartY = Math.ceil(Y / pixelSize) - 1;
+    const lineStartX = Math.ceil(X / pixelSizeX) - 1;
+    const lineStartY = Math.ceil(Y / pixelSizeY) - 1;
     ctx.fillStyle = color;
 
     const colorErase = (x, y) => {
-        const startX = x * pixelSize;
-        const startY = y * pixelSize;
-        ctx.clearRect(startX, startY, pixelSize, pixelSize);
+        const startX = x * pixelSizeX;
+        const startY = y * pixelSizeY;
+        ctx.clearRect(startX, startY, pixelSizeX, pixelSizeY);
     }
 
     const eraser = (event) => {
         const eventEndX = event.offsetX;
         const eventEndY = event.offsetY;
-        const lineEndX = Math.ceil(eventEndX / pixelSize) - 1;
-        const lineEndY = Math.ceil(eventEndY / pixelSize) - 1;
+        const lineEndX = Math.ceil(eventEndX / pixelSizeX) - 1;
+        const lineEndY = Math.ceil(eventEndY / pixelSizeY) - 1;
         colorErase(lineEndX, lineEndY);
     }
 
