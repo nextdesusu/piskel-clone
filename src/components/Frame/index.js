@@ -1,26 +1,23 @@
 import React from 'react';
 import './Frame.css';
 
-export default class Frame extends React.Component {
-    componentDidMount() {
-        const {
-            data,
-            frameRef,
-            width,
-            height
-        } = this.props;
-        const frame = frameRef.current;
-        frame.width = width;
-        frame.height = height;
-        const ctx = frame.getContext('2d');
-        ctx.putImageData(data, 0, 0);
-    }
-
-    render() {
-        const {
-            frameRef,
-            id
-        } = this.props;
-        return (<canvas data-id={id} ref={frameRef} className='frame'></canvas>);
-    }
+export default function Frame(props) {
+    const  {
+        frameRef,
+        id,
+        onMouseDown,
+        data,
+    } = props;
+    return (
+        <div>
+            <img
+                alt={`img:${id}`}
+                src={data}
+                onMouseDown={onMouseDown}
+                data-id={id}
+                ref={frameRef}
+                className='frame droppable'>
+            </img>
+        </div>
+    );
 }

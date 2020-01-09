@@ -1,6 +1,16 @@
 .frame {
-    width: 100px;
-    height: 100px;
+    width: 8em;
+    height: 8em;
     background-color: gray;
     cursor: pointer;
+}
+
+.dragging {
+    position: absolute;
+    border: 1px solid black;
+    z-index: 1000;
+}
+
+.enter-droppable {
+    background-color: pink;
 }

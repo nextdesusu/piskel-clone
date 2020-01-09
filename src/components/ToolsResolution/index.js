@@ -96,27 +96,29 @@ class ToolsResolution extends React.Component {
                     }
                 </ul>
                 <div>
-                    <label htmlFor='custom-reslotuion'>custom resolution</label>
                     <input
-                        type='number'
+                        step='4'
+                        type='range'
                         max={maxRes}
                         min={minRes}
-                        value={inputWidth}
                         onChange={onResChange}
                         id={widthChangeId}
                         placeholder='set width'
                         name='custom-reslotuion'>
                     </input>
+                    <label htmlFor='custom-reslotuion'>width: {inputWidth}</label>
+                    <br></br>
                     <input
-                        type='number'
+                        step='4'
+                        type='range'
                         max={maxRes}
                         min={minRes}
-                        value={inputHeight}
                         onChange={onResChange}
                         id={heightChangeId}
                         placeholder='set height'
                         name='custom-reslotuion'>
                     </input>
+                    <label htmlFor='custom-reslotuion'>height: {inputHeight}</label>
                     <button onClick={onResSubmit}>set resolution</button>
                 </div>
             </section>
