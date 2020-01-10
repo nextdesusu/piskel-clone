@@ -1,13 +1,17 @@
 import React from 'react';
 import { ToolsItem } from '../Items';
-import { connect } from 'react-redux';
-import { changeResolution } from '../../actions';
 
-
-class ToolsResolution extends React.Component {
-    state = {
-        inputWidth: 4,
-        inputHeight: 4,
+export default class ToolsResolution extends React.Component {
+    constructor(props) {
+        super(props);
+        const {
+            width,
+            height,
+        } = props.resolution;
+        this.state = {
+            inputWidth: width,
+            inputHeight: height,
+        }
     }
 
     get widthChangeId() {
@@ -33,30 +37,6 @@ class ToolsResolution extends React.Component {
         this.props.setResolution(inputWidth, inputHeight);
     }
 
-    get ToolItems() {
-        const { setResolution } = this.props;
-        const resX4 = 4;
-        const resX32 = 32;
-        const resX128 = 128;
-        const resToStr = (res) => `${res}x${res};`
-        return [
-            {
-                resSize: resX4,
-                onClick: () => setResolution(resX4, resX4),
-                text: resToStr(resX4),
-            },
-            {
-                resSize: resX32,
-                onClick: () => setResolution(resX32, resX32),
-                text: resToStr(resX32),
-            },
-            {
-                resSize: resX128,
-                onClick: () => setResolution(resX128, resX128),
-                text: resToStr(resX128),
-            },
-        ]
-    }
     render(){
         const {
             ToolItems,
@@ -71,30 +51,44 @@ class ToolsResolution extends React.Component {
             inputWidth,
             inputHeight,
         } = state;
-        const { resolution } = props;
+        const {
+            resolution,
+            setResolution
+        } = props;
+        const {
+            width,
+            height,
+        } = resolution;
         const maxRes = 512;
         const minRes = 4;
+        const resX4 = 4;
+        const resX32 = 32;
+        const resX128 = 128;
+        const resToStr = (res) => `${res}x${res};`
         return (
             <section className='tools'>
-                <h2>Resolutions</h2>
-                <ul className='tools-list' id='tools_list'>
-                    {
-                        ToolItems.map((item, key) => {
-                            const {
-                                resSize,
-                                onClick,
-                                text
-                            } = item
-                            const highlighted = resSize === resolution;
-                            return <ToolsItem
-                                key={key}
-                                onClick={onClick}
-                                text={text}
-                                highlighted={highlighted}
-                            />
-                        })
-                    }
-                </ul>
+                <div className='tools-list-wrapper'>
+                    <ul className='tools-list' id='tools_list'>
+                        <ToolsItem
+                            onClick={() => setResolution(resX4, resX4)}
+                            text={resToStr(resX4)}
+                            iconSrc={null}
+                            highlighted={resX4 === width && resX4 === height}
+                        />
+                        <ToolsItem
+                            onClick={() => setResolution(resX32, resX32)}
+                            text={resToStr(resX32)}
+                            iconSrc={null}
+                            highlighted={resX32 === width && resX32 === height}
+                        />
+                        <ToolsItem
+                            onClick={() => setResolution(resX128, resX128)}
+                            text={resToStr(resX128)}
+                            iconSrc={null}
+                            highlighted={resX128 === width && resX128 === height}
+                        />
+                    </ul>
+                </div>
                 <div>
                     <input
                         step='4'
@@ -119,24 +113,10 @@ class ToolsResolution extends React.Component {
                         name='custom-reslotuion'>
                     </input>
                     <label htmlFor='custom-reslotuion'>height: {inputHeight}</label>
+                    <br></br>
                     <button onClick={onResSubmit}>set resolution</button>
                 </div>
             </section>
         )
     }
 }
-
-const mapStateToProps = store => {
-    return {
-        resolution: store.resolution,
-    }
-}
-  
-const mapDispatchToProps = dispatch => ({
-    setResolution: (newX, newY) => dispatch(changeResolution(newX, newY)),
-})
-
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(ToolsResolution);

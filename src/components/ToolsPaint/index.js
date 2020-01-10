@@ -1,11 +1,6 @@
 import React from 'react';
 import './ToolsPaint.css';
 import { ToolsItem, ColorItem } from '../Items';
-import { connect } from 'react-redux';
-import {
-    changeTool,
-    changeColor,
-} from '../../actions';
 import {
     COLOR_PICKER_SIZE,
     BUCKET_TOOL,
@@ -20,7 +15,7 @@ import BucketIcon from '../../images/bucket.svg';
 import ColorPickerIcon from '../../images/color-picker.svg';
 import PencilIcon from '../../images/pencil.svg';
 
-class ToolsPaint extends React.Component {
+export default class ToolsPaint extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -54,7 +49,8 @@ class ToolsPaint extends React.Component {
     }
 
     componentDidMount() {
-        this.drawColors(0);
+        const initialHue = 0;
+        this.drawColors(initialHue);
     }
 
     chooseColor = (event) => {
@@ -69,55 +65,20 @@ class ToolsPaint extends React.Component {
         const ctx = colorPicker.getContext('2d');
         const color = ctx.getImageData(offsetX, offsetY, 1, 1).data;
         setColor(color);
-        //console.log('color', color);
-    }
-
-    get ToolsItems() {
-        const { setTool } = this.props;
-        return [
-            {
-                id: BUCKET_TOOL,
-                onClick: () => setTool(BUCKET_TOOL),
-                text: 'bucket',
-                iconSrc: BucketIcon,
-            },
-            {
-                id: COLOR_PICKER_TOOL,
-                onClick: () => setTool(COLOR_PICKER_TOOL),
-                text: 'color picker',
-                iconSrc: ColorPickerIcon,
-            },
-            {
-                id: PENCIL_TOOL,
-                onClick: () => setTool(PENCIL_TOOL),
-                text: 'pencil',
-                iconSrc: PencilIcon,
-            },
-            {
-                id: STROKE_TOOL,
-                onClick: () => setTool(STROKE_TOOL),
-                text: 'stroke',
-                iconSrc: null,
-            },
-            {
-                id: ERASE_TOOL,
-                onClick: () => setTool(ERASE_TOOL),
-                text: 'erase',
-                iconSrc: null,
-            }
-        ];
     }
 
     render(){
         const {
             props,
             state,
-            ToolsItems
+            chooseColor,
+            silderOnChange,
         } = this;
         const {
             currentColor,
             previousColor,
             currentTool,
+            setTool,
             setColor
         } = props;
         const {
@@ -126,68 +87,78 @@ class ToolsPaint extends React.Component {
         const extractedCurrent = extractColor(currentColor);
         const extractedPrevious = extractColor(previousColor);
         return (
-            <section className="tools">
-                <h2>Painting tools</h2>
-                <ul className="tools-list" id="tools_list">
-                    {
-                        ToolsItems.map((item, key) => {
-                            const {
-                                id,
-                                onClick,
-                                text,
-                                iconSrc,
-                            } = item;
-                            const highlighted = id === currentTool
-                            return <ToolsItem
-                                key={key}
-                                onClick={onClick}
-                                text={text}
-                                iconSrc={iconSrc}
-                                highlighted={highlighted}
-                            />
-                        })
-                    }
-                </ul>
-                <ul className="tools-list" id="colors_list">
-                    <ColorItem onClick={() => {}} text='current color' colorName={extractedCurrent}/>
-                    <ColorItem onClick={() => {setColor(previousColor)}} text='previous color' colorName={extractedPrevious}/>
-                </ul>
-                <div className='color-wrapper'>
-                    <canvas
-                        ref={colorPickerRef}
-                        onClick={this.chooseColor}
-                        className='color-picker'
-                    >
-                    </canvas>
-                    <input
-                        className='color-slider'
-                        onMouseUp={this.silderOnChange}
-                        min='0'
-                        max='359'
-                        step='1'
-                        type='range'
-                    >    
-                    </input>
+            <section className='tools'>
+                <div className='tools-list-wrapper'>
+                    <ul className='tools-list' id='tools_list'>
+                        <ToolsItem 
+                            id={BUCKET_TOOL}
+                            onClick={() => setTool(BUCKET_TOOL)}
+                            text={'bucket'}
+                            iconSrc={BucketIcon}
+                            highlighted={BUCKET_TOOL === currentTool}
+                        />
+                        <ToolsItem 
+                            id={COLOR_PICKER_TOOL}
+                            onClick={() => setTool(COLOR_PICKER_TOOL)}
+                            text={'color picker'}
+                            iconSrc={ColorPickerIcon}
+                            highlighted={COLOR_PICKER_TOOL === currentTool}
+                        />
+                        <ToolsItem 
+                            id={PENCIL_TOOL}
+                            onClick={() => setTool(PENCIL_TOOL)}
+                            text={'pencil'}
+                            iconSrc={PencilIcon}
+                            highlighted={PENCIL_TOOL === currentTool}
+                        />
+                        <ToolsItem 
+                            id={STROKE_TOOL}
+                            onClick={() => setTool(STROKE_TOOL)}
+                            text={'stroke'}
+                            iconSrc={null}
+                            highlighted={STROKE_TOOL === currentTool}
+                        />
+                        <ToolsItem 
+                            id={ERASE_TOOL}
+                            onClick={() => setTool(ERASE_TOOL)}
+                            text={'erase'}
+                            iconSrc={null}
+                            highlighted={ERASE_TOOL === currentTool}
+                        />
+                    </ul>
+                </div>
+                <div className='tools-list-wrapper'>
+                    <ul className='tools-list' id='colors_list'>
+                        <ColorItem
+                            onClick={() => {}}
+                            text='current color'
+                            colorName={extractedCurrent}
+                        />
+                        <ColorItem
+                            onClick={() => {setColor(previousColor)}}
+                            text='previous color'
+                            colorName={extractedPrevious}
+                        />
+                    </ul>
+                    <div className='color-wrapper'>
+                        <canvas
+                            ref={colorPickerRef}
+                            onClick={chooseColor}
+                            className='color-picker'
+                        >
+                        </canvas>
+                        <input
+                            className='color-slider'
+                            onMouseUp={silderOnChange}
+                            min='0'
+                            max='359'
+                            step='1'
+                            type='range'
+                        >    
+                        </input>
+                    </div>
                 </div>
             </section>
         )
     }
 }
-
-const mapStateToProps = store => {
-    return {
-        currentTool: store.currentTool,
-        currentColor: store.currentColor,
-        previousColor: store.previousColor,
-    }
-}
-  
-const mapDispatchToProps = dispatch => ({
-    setTool: toolId => dispatch(changeTool(toolId)),
-    setColor: newColor => dispatch(changeColor(newColor)),
-})
-
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(ToolsPaint);

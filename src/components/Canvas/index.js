@@ -1,23 +1,25 @@
 import React from 'react';
 import './Canvas.css';
-import { connect } from 'react-redux';
 import { SButton } from '../Elements'; 
 import UseTool from '../../utils/UseTool';
 import { extractColor } from '../../utils/ColorFunctions';
-import Frame from '../Frame';
+import Frames from '../Frames';
 import ContextMenu from '../ContextMenu';
 import GIF from 'gif.js-upgrade';
 
-import { changeColor } from '../../actions';
-
-class Canvas extends React.Component {
+export default class Canvas extends React.Component {
     constructor(props) {
         super(props);
+        const {
+            width,
+            height,
+            fps,
+        } = props;
         this.state = {
             canvasRef: React.createRef(),
-            width: 512,
-            height: 512,
-            fps: 1,
+            width,
+            height,
+            fps,
             contextMenuProps: {
                 options: [],
                 posX: 0,
@@ -178,7 +180,7 @@ class Canvas extends React.Component {
         } = state;
         let currentFrame = 0;
         const animId = setInterval(() => {
-            drawFrame(currentFrame)
+            drawFrame(currentFrame);
             currentFrame += 1;
             if (currentFrame === frames.length) clearInterval(animId);
         }, MS);
@@ -218,75 +220,6 @@ class Canvas extends React.Component {
         UseTool(options);
     }
 
-    frameOnMouseDown = (event) => {
-        if (event.button === 2) return;
-        event.target.ondragstart = function() {
-            return false;
-          };
-        let currentDroppable = null;
-        const {
-            clientX,
-            clientY,
-            pageX,
-            pageY,
-        } = event;
-        const frame = event.target;
-        const shiftX = clientX - frame.getBoundingClientRect().left;
-        const shiftY = clientY - frame.getBoundingClientRect().top;
-        frame.classList.add('dragging');
-
-        const moveAt = (pageX, pageY) => {
-            frame.style.left = `${pageX - shiftX}px`;
-            frame.style.top = `${pageY - shiftY}px`;
-        }
-
-        const enterDroppable = (elem)=> {
-            elem.classList.add('enter-droppable');
-        }
-      
-        const leaveDroppable = (elem) => {
-            elem.classList.remove('enter-droppable');
-        }
-
-        moveAt(frame, pageX, pageY);
-
-        const onMouseMove = (event) => {
-            moveAt(event.pageX, event.pageY);
-    
-            frame.hidden = true;
-            const elemBelow = document.elementFromPoint(event.clientX, event.clientY);
-            frame.hidden = false;
-            if (!elemBelow) return;
-    
-            const droppableBelow = elemBelow.closest('.droppable');
-            if (currentDroppable !== droppableBelow) {
-                if (currentDroppable) { // null when we were not over a droppable before this event
-                    leaveDroppable(currentDroppable);
-                }
-                currentDroppable = droppableBelow;
-                if (currentDroppable) { // null if we're not coming over a droppable now
-                    // (maybe just left the droppable)
-                    enterDroppable(currentDroppable);
-                }
-            }
-        }
-        document.addEventListener('mousemove', onMouseMove);
-        frame.onmouseup = (event) => {
-            frame.hidden = true;
-            const elemBelow = document.elementFromPoint(event.clientX, event.clientY);
-            frame.hidden = false;
-            if (!elemBelow) return;
-            const frameId = Number(frame.getAttribute('data-id'));
-            const elemBelowId = Number(elemBelow.getAttribute('data-id'));
-            elemBelow.classList.remove('enter-droppable');
-            frame.classList.remove('dragging')
-            document.removeEventListener('mousemove', onMouseMove);
-            frame.onmouseup = null;
-            this.swapFrames(frameId, elemBelowId);
-        };
-    }
-
-
     componentDidMount() {
         const {
             width,
@@ -307,6 +240,7 @@ class Canvas extends React.Component {
             addFrame,
             createGif,
             getUseToolFunction,
+            swapFrames,
         } = this;
         const {
             canvasRef,
@@ -333,52 +267,14 @@ class Canvas extends React.Component {
                         className='canvas'>
                     </canvas>
                 </div>
-                <SButton text='add frame' onClick={addFrame}/>
-                <SButton text='animate' onClick={animate} />
-                <SButton text='download gif' onClick={createGif} />
-                {downLoadLink ? downLoadLink : null}
-                <div onContextMenu={showContextMenu}>
-                    {
-                        displayCM ? <ContextMenu options={options} posX={posX} posY={posY} /> : null
-                    }
-                    {
-                        frames.map((frameData, id) => {
-                            const {
-                                text,
-                                data,
-                                frameRef,
-                            } = frameData;
-                            return <Frame
-                                id={id}
-                                key={id}
-                                text={text}
-                                data={data}
-                                onMouseDown={this.frameOnMouseDown}
-                                frameRef={frameRef}
-                                width={512}
-                                height={512}
-                            />
-                        })
-                    }
+                <div className='canvas-menu'>
+                    <SButton text='add frame' onClick={addFrame}/>
+                    <SButton text='animate' onClick={animate} />
+                    <SButton text='download gif' onClick={createGif} />
+                    {downLoadLink ? downLoadLink : null}
                 </div>
+                <Frames swapFrames={swapFrames} frames={frames}/>
             </section>
         )
     }
 }
-
-const mapStateToProps = store => {
-    return {
-        resolution: store.resolution,
-        currentTool: store.currentTool,
-        currentColor: store.currentColor,
-    }
-}
-
-const mapDispatchToProps = dispatch => ({
-    setColor: newColor => dispatch(changeColor(newColor)),
-})
-
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(Canvas);

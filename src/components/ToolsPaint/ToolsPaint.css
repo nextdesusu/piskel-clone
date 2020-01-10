@@ -1,23 +1,30 @@
 .tools-list {
     list-style: none;
-    display: block;
-    width: 70%;
+}
+
+.tools-list-wrapper {
     box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.5);
-    margin-bottom: 20%;
+    width: 70%;
+    margin-bottom: 10%;
+    padding: 1em;
 }
 
 .color-wrapper {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 0.1em;
     align-items: center;
     justify-content: space-around;
 }
 
 .color-picker {
-    width: 200px;
-    height: 200px;
-    border: 1px solid black;
+    width: 10em;
+    height: 10em;
+    border: 0.1em solid black;
 }
 
 .color-slider {
+    width: 10em;
+    height: 10em;
     transform: rotate(90deg);
 }
