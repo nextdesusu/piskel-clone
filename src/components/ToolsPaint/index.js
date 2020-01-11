@@ -7,10 +7,11 @@ import {
     COLOR_PICKER_TOOL,
     PENCIL_TOOL,
     STROKE_TOOL,
+    PAINT_ALL_SAME_COLORS,
     ERASE_TOOL,
 } from '../../consts'
-import { extractColor } from '../../utils/ColorFunctions';
 
+import ExtractColor from '../../utils/ExtractColor';
 import BucketIcon from '../../images/bucket.svg';
 import ColorPickerIcon from '../../images/color-picker.svg';
 import PencilIcon from '../../images/pencil.svg';
@@ -34,7 +35,7 @@ export default class ToolsPaint extends React.Component {
         const maxHslValue = 100;
         colorPicker.width = colorPickerSize;
         colorPicker.height = colorPickerSize;
-        for(let row = 0; row < colorPickerSize; row += 1){
+        for (let row = 0; row < colorPickerSize; row += 1){
             const grad = ctx.createLinearGradient(0, 0, colorPickerSize, colorPickerSize);
             grad.addColorStop(0, `hsl(${hue}, 100%, ${row / colorPickerSize * maxHslValue}%)`);
             grad.addColorStop(1, `hsl(${hue}, 0%, ${row / colorPickerSize * maxHslValue}%)`);
@@ -84,8 +85,8 @@ export default class ToolsPaint extends React.Component {
         const {
             colorPickerRef
         } = state;
-        const extractedCurrent = extractColor(currentColor);
-        const extractedPrevious = extractColor(previousColor);
+        const extractedCurrent = ExtractColor(currentColor);
+        const extractedPrevious = ExtractColor(previousColor);
         return (
             <section className='tools'>
                 <div className='tools-list-wrapper'>
@@ -117,6 +118,13 @@ export default class ToolsPaint extends React.Component {
                             text={'stroke'}
                             iconSrc={null}
                             highlighted={STROKE_TOOL === currentTool}
+                        />
+                        <ToolsItem 
+                            id={PAINT_ALL_SAME_COLORS}
+                            onClick={() => setTool(PAINT_ALL_SAME_COLORS)}
+                            text={'paint all pixels of the same color'}
+                            iconSrc={null}
+                            highlighted={PAINT_ALL_SAME_COLORS === currentTool}
                         />
                         <ToolsItem 
                             id={ERASE_TOOL}

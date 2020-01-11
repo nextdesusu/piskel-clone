@@ -1,10 +1,8 @@
 import React from 'react';
-import './Canvas.css';
-import { SButton } from '../Elements'; 
+import './Canvas.css'; 
 import UseTool from '../../utils/UseTool';
-import { extractColor } from '../../utils/ColorFunctions';
+import ExtractColor from '../../utils/ExtractColor';
 import Frames from '../Frames';
-import ContextMenu from '../ContextMenu';
 import GIF from 'gif.js-upgrade';
 
 export default class Canvas extends React.Component {
@@ -20,21 +18,21 @@ export default class Canvas extends React.Component {
             width,
             height,
             fps,
-            contextMenuProps: {
-                options: [],
-                posX: 0,
-                posY: 0,
-                displayCM: false,
-            },
             downLoadLink: null,
+            inAnimation: false,
             frames: [],
         }
     }
 
+    changeFps = (event) => {
+        const newFps = event.target.value;
+        this.setState({ fps: newFps });
+    }
+
     get MS() {
         const FPS = this.state.fps;
-        const ms = 100;
-        return Math.floor(ms / FPS);
+        const second = 1000;
+        return Math.floor(second / FPS);
     }
 
     createGif = () => {
@@ -72,8 +70,11 @@ export default class Canvas extends React.Component {
         const frames = this.state.frames;
         const {
             canvasRef,
+            width,
+            height,
         } = this.state;
         const canvas = canvasRef.current;
+        const ctx = canvas.getContext('2d');
         const data = canvas.toDataURL("image/png")
         const frameRef = React.createRef();
         const newFrame = {
@@ -81,9 +82,11 @@ export default class Canvas extends React.Component {
             frameRef,
         };
         this.setState({ frames: [...frames, newFrame] });
+        ctx.clearRect(0, 0, width, height);
     }
 
     deleteFrame = (frameId) => {
+        if (frameId === null || frameId === undefined) return;
         const frames = this.state.frames;
         const newData = frames.filter((frameProp) => {
             const frame = frameProp.frameRef.current;
@@ -94,6 +97,7 @@ export default class Canvas extends React.Component {
     }
 
     duplicateFrame = (frameId) => {
+        if (frameId === null || frameId === undefined) return;
         const { frames } = this.state;
         const frame = frames[frameId];
         const leftPart = frames.slice(0, frameId);
@@ -111,43 +115,16 @@ export default class Canvas extends React.Component {
         this.setState({ frames: [...newframes] });
     }
 
-    showContextMenu = (event) => {
-        event.preventDefault();
-        let id = event.target.getAttribute('data-id');
-        const {
-            deleteFrame,
-            drawFrame,
-            duplicateFrame,
-        } = this;
-        if (id === null) return;
-        id = Number(id);
-        const {
-            pageX,
-            pageY,
-        } = event
-        const contextMenuProps = {
-            options: [
-                {
-                    text: 'redact',   
-                    onClick: () => drawFrame(id),
-                },
-                {
-                    text: 'delete',
-                    onClick: () => deleteFrame(id),
-                },
-                {
-                    text: 'duplicate',
-                    onClick: () => duplicateFrame(id),
-                }
-            ],
-            posX: pageX,
-            posY: pageY,
-            displayCM: true,
-        }
-        this.setState({ contextMenuProps });
+    getImageFromFrame = (frameId) => {
+        if (frameId === null || frameId === undefined) return;
+        const { frames } = this.state;
+        const frame = frames[frameId].frameRef.current;
+        console.log('getting image from:', frame);
+        //window.open(frame);
     }
 
     drawFrame = (frameId) => {
+        if (frameId === null || frameId === undefined) return;
         const {
             state,
             drawImage
@@ -177,12 +154,18 @@ export default class Canvas extends React.Component {
         } = this;
         const {
             frames,
+            inAnimation
         } = state;
+        if (inAnimation) return;
         let currentFrame = 0;
+        this.setState({ inAnimation: true });
         const animId = setInterval(() => {
             drawFrame(currentFrame);
             currentFrame += 1;
-            if (currentFrame === frames.length) clearInterval(animId);
+            if (currentFrame === frames.length){
+                clearInterval(animId);
+                this.setState({ inAnimation: false });
+            }
         }, MS);
     }
 
@@ -202,8 +185,11 @@ export default class Canvas extends React.Component {
             offsetY,
         } = event.nativeEvent;
         const canvas = event.target;
+        const canvasRect = canvas.getBoundingClientRect();
         const pixelSizeX = Math.floor(width / resolution.width);
         const pixelSizeY = Math.floor(height / resolution.height);
+        const delX = Math.floor(canvasRect.width / resolution.width);
+        const delY = Math.floor(canvasRect.height / resolution.height);
         const options = {
             canvas: canvas,
             pixelSizeX: pixelSizeX,
@@ -211,9 +197,13 @@ export default class Canvas extends React.Component {
             width: width,
             height: height,
             tool: currentTool,
-            color: extractColor(currentColor),
+            color: ExtractColor(currentColor),
             rawColor: currentColor,
             setColor: setColor,
+            canvasHeight: canvasRect.height,
+            canvasWidth: canvasRect.width,
+            delX: delX,
+            delY: delY,
             X: offsetX,
             Y: offsetY,
         }
@@ -235,45 +225,56 @@ export default class Canvas extends React.Component {
         const {
             state,
             showContextMenu,
-            animate,
-            deleteLast,
+            deleteFrame,
+            changeFps,
             addFrame,
+            drawFrame,
             createGif,
             getUseToolFunction,
             swapFrames,
+            closeContextMenu,
+            duplicateFrame,
+            getImageFromFrame
         } = this;
         const {
             canvasRef,
             width,
             height,
-            contextMenuProps,
             frames,
+            fps,
             downLoadLink
         } = state;
-        const {
-            options,
-            posX,
-            posY,
-            displayCM
-        } = contextMenuProps;
         return (
             <section className='canvas-section'>
-                <div className='canvas-wrapper'>
-                    <canvas
-                        ref={canvasRef}
-                        onMouseDown={getUseToolFunction}
-                        width={width}
-                        height={height}
-                        className='canvas'>
-                    </canvas>
+                <div className='canvas-part2'>
+                    <Frames
+                        showContextMenu={showContextMenu}
+                        closeContextMenu={closeContextMenu}
+                        swapFrames={swapFrames}
+                        frames={frames}
+                        addFrame={addFrame}
+                        deleteFrame={deleteFrame}
+                        duplicateFrame={duplicateFrame}
+                        drawFrame={drawFrame}
+                        getImageFromFrame={getImageFromFrame}
+                        addFrame={addFrame}
+                    />
                 </div>
-                <div className='canvas-menu'>
-                    <SButton text='add frame' onClick={addFrame}/>
-                    <SButton text='animate' onClick={animate} />
-                    <SButton text='download gif' onClick={createGif} />
-                    {downLoadLink ? downLoadLink : null}
+                <div className='canvas-part1'>
+                    <div className='canvas-wrapper'>
+                        <canvas
+                            ref={canvasRef}
+                            onMouseDown={getUseToolFunction}
+                            width={width}
+                            height={height}
+                            className='canvas'>
+                        </canvas>
+                    </div>
+                    <div className='canvas-fps-wrapper'>
+                        <input onChange={changeFps} value={fps} type='range' min='1' max='30' step='1'></input>
+                        <label>current fps: {fps}</label>
+                    </div>
                 </div>
-                <Frames swapFrames={swapFrames} frames={frames}/>
             </section>
         )
     }

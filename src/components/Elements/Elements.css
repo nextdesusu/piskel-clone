@@ -1,10 +1,10 @@
 .standart-button {
     background-color: white;
     font-weight: bold; 
-    border-radius: 0.5em;
-    border-color: black;
+    box-shadow: 3px 1px 3px 1px;
     height: 2.8em;
     cursor: pointer;
     padding: 0.3em;
     width: 10em;
+    text-transform: capitalize;
 }

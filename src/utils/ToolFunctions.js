@@ -1,6 +1,8 @@
 import { nonRecursiveFillBucket, bresenhamAlgorithm } from './Alghoritms';
 
-export function colorPickerTool (options) {
+const getPixelCoords = (coords, del) => Math.ceil((coords) / del) - 1;
+
+export function colorPickerTool(options) {
     const {
         canvas,
         X,
@@ -17,6 +19,23 @@ export function colorPickerTool (options) {
     canvas.addEventListener('mouseup', onEnd);
 }
 
+export function paintAllSameColor(options) {
+    const {
+        canvas,
+        width,
+        height,
+        color
+    } = options;
+    const ctx = canvas.getContext('2d');
+    ctx.fillStyle = color;
+    function onEnd(event){
+        ctx.fillRect(0, 0, width, height);
+        canvas.removeEventListener('mouseup', onEnd);
+    }
+
+    canvas.addEventListener('mouseup', onEnd);
+}
+
 export function fillBucketTool(options){
     const {
         canvas,
@@ -25,12 +44,14 @@ export function fillBucketTool(options){
         color,
         width,
         height,
+        delX,
+        delY,
         X,
         Y
     } = options;
     const ctx = canvas.getContext('2d');
-    const startX = Math.ceil(X / pixelSizeX) - 1;
-    const startY = Math.ceil(Y / pixelSizeY) - 1;
+    const startX = getPixelCoords(X, delX);
+    const startY = getPixelCoords(Y, delY);
     const calcW =  width / pixelSizeX;
     const calcH = height / pixelSizeY;
     const toChange = ctx.getImageData(X, Y, 1, 1).data;
@@ -69,12 +90,14 @@ export function pencilTool(options) {
         pixelSizeX,
         pixelSizeY,
         color,
+        delX,
+        delY,
         X,
         Y
     } = options;
     const ctx = canvas.getContext('2d');
-    const lineStartX = Math.ceil(X / pixelSizeX) - 1;
-    const lineStartY = Math.ceil(Y / pixelSizeY) - 1;
+    const lineStartX = getPixelCoords(X, delX);
+    const lineStartY = getPixelCoords(Y, delY);
     ctx.fillStyle = color;
 
     const colorSwapper = (x, y) => {
@@ -86,8 +109,8 @@ export function pencilTool(options) {
     const swapColor = (event) => {
         const eventEndX = event.offsetX;
         const eventEndY = event.offsetY;
-        const lineEndX = Math.ceil(eventEndX / pixelSizeX) - 1;
-        const lineEndY = Math.ceil(eventEndY / pixelSizeY) - 1;
+        const lineEndX = getPixelCoords(eventEndX, delX);
+        const lineEndY = getPixelCoords(eventEndY, delY);
         colorSwapper(lineEndX, lineEndY);
     }
 
@@ -107,12 +130,14 @@ export function strokeTool(options) {
         pixelSizeX,
         pixelSizeY,
         color,
+        delX,
+        delY,
         X,
         Y
     } = options;
     const ctx = canvas.getContext('2d');
-    const lineStartX = Math.ceil(X / pixelSizeX) - 1;
-    const lineStartY = Math.ceil(Y / pixelSizeY) - 1;
+    const lineStartX = getPixelCoords(X, delX);
+    const lineStartY = getPixelCoords(Y, delY);
     ctx.fillStyle = color;
 
     const colorSwapper = (x, y) => {
@@ -124,8 +149,8 @@ export function strokeTool(options) {
     const onEnd = (event) => {
         const eventEndX = event.offsetX;
         const eventEndY = event.offsetY;
-        const lineEndX = Math.ceil(eventEndX / pixelSizeX) - 1;
-        const lineEndY = Math.ceil(eventEndY / pixelSizeY) - 1;
+        const lineEndX = getPixelCoords(eventEndX, delX);
+        const lineEndY = getPixelCoords(eventEndY, delY);;
         bresenhamAlgorithm(colorSwapper, lineStartX, lineStartY, lineEndX, lineEndY);
         canvas.removeEventListener('mouseup', onEnd);
     }
@@ -139,13 +164,15 @@ export function eraseTool(options) {
         pixelSizeX,
         pixelSizeY,
         color,
+        delX,
+        delY,
         X,
         Y
     } = options;
 
     const ctx = canvas.getContext('2d');
-    const lineStartX = Math.ceil(X / pixelSizeX) - 1;
-    const lineStartY = Math.ceil(Y / pixelSizeY) - 1;
+    const lineStartX = getPixelCoords(X, delX);
+    const lineStartY = getPixelCoords(Y, delY);;
     ctx.fillStyle = color;
 
     const colorErase = (x, y) => {
@@ -157,8 +184,8 @@ export function eraseTool(options) {
     const eraser = (event) => {
         const eventEndX = event.offsetX;
         const eventEndY = event.offsetY;
-        const lineEndX = Math.ceil(eventEndX / pixelSizeX) - 1;
-        const lineEndY = Math.ceil(eventEndY / pixelSizeY) - 1;
+        const lineEndX = getPixelCoords(eventEndX, delX);
+        const lineEndY = getPixelCoords(eventEndY, delY);
         colorErase(lineEndX, lineEndY);
     }
 

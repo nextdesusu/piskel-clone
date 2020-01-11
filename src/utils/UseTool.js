@@ -4,6 +4,7 @@ import {
     pencilTool,
     strokeTool,
     eraseTool,
+    paintAllSameColor,
 } from './ToolFunctions';
 
 import {
@@ -11,6 +12,7 @@ import {
     COLOR_PICKER_TOOL,
     PENCIL_TOOL,
     STROKE_TOOL,
+    PAINT_ALL_SAME_COLORS,
     ERASE_TOOL,
 } from '../consts';
 
@@ -25,6 +27,8 @@ export default function UseTool(options) {
             return pencilTool(options);
         case STROKE_TOOL:
             return strokeTool(options);
+        case PAINT_ALL_SAME_COLORS:
+            return paintAllSameColor(options);
         case ERASE_TOOL:
             return eraseTool(options);
         default:

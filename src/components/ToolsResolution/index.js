@@ -91,6 +91,7 @@ export default class ToolsResolution extends React.Component {
                 </div>
                 <div>
                     <input
+                        value={inputWidth}
                         step='4'
                         type='range'
                         max={maxRes}
@@ -103,6 +104,7 @@ export default class ToolsResolution extends React.Component {
                     <label htmlFor='custom-reslotuion'>width: {inputWidth}</label>
                     <br></br>
                     <input
+                        value={inputHeight}
                         step='4'
                         type='range'
                         max={maxRes}
