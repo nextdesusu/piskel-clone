@@ -11,7 +11,7 @@
 
 .color-wrapper {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
     grid-gap: 0.1em;
     align-items: center;
     justify-content: space-around;
@@ -21,10 +21,4 @@
     width: 10em;
     height: 10em;
     border: 0.1em solid black;
-}
-
-.color-slider {
-    width: 10em;
-    height: 10em;
-    transform: rotate(90deg);
 }

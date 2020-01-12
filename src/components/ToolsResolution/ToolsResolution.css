@@ -1,0 +1,9 @@
+.tools-inputs {
+    width: 10em;
+}
+
+.input-header {
+    margin-bottom: 0.5em;
+    text-transform: uppercase;
+    font-weight: bold;
+}

@@ -6,13 +6,20 @@
     background-color: black;
 }
 
-.canvas-header {
-    text-align: center;
-    text-transform: capitalize;
+.canvas-buttons-wrapper {
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    grid-gap: 1em;
 }
 
-.canvas-section {
-    align-self: center;
+.canvas-buttons1 {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 0.5em;
+}
+
+.canvas-buttons2 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 0.5em;
 }

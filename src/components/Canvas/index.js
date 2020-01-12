@@ -2,6 +2,7 @@ import React from 'react';
 import './Canvas.css'; 
 import UseTool from '../../utils/UseTool';
 import ExtractColor from '../../utils/ExtractColor';
+import { SButton } from '../Elements';
 import Frames from '../Frames';
 import GIF from 'gif.js-upgrade';
 
@@ -20,6 +21,7 @@ export default class Canvas extends React.Component {
             fps,
             downLoadLink: null,
             inAnimation: false,
+            focusedFrameId: null,
             frames: [],
         }
     }
@@ -221,6 +223,10 @@ export default class Canvas extends React.Component {
         canvas.height = height;
     }
 
+    focusFrame = (id) => {
+        this.setState({ focusedFrameId: parseInt(id) });
+    }
+
     render() {
         const {
             state,
@@ -234,7 +240,9 @@ export default class Canvas extends React.Component {
             swapFrames,
             closeContextMenu,
             duplicateFrame,
-            getImageFromFrame
+            getImageFromFrame,
+            focusFrame,
+            animate,
         } = this;
         const {
             canvasRef,
@@ -242,25 +250,16 @@ export default class Canvas extends React.Component {
             height,
             frames,
             fps,
-            downLoadLink
+            downLoadLink,
+            focusedFrameId
         } = state;
+        const useFrameFunction = (func) => () => {
+            this.setState({ focusedFrameId: null});
+            func(focusedFrameId);
+        }
         return (
             <section className='canvas-section'>
-                <div className='canvas-part2'>
-                    <Frames
-                        showContextMenu={showContextMenu}
-                        closeContextMenu={closeContextMenu}
-                        swapFrames={swapFrames}
-                        frames={frames}
-                        addFrame={addFrame}
-                        deleteFrame={deleteFrame}
-                        duplicateFrame={duplicateFrame}
-                        drawFrame={drawFrame}
-                        getImageFromFrame={getImageFromFrame}
-                        addFrame={addFrame}
-                    />
-                </div>
-                <div className='canvas-part1'>
+                <div className='canvas-main'>
                     <div className='canvas-wrapper'>
                         <canvas
                             ref={canvasRef}
@@ -270,11 +269,45 @@ export default class Canvas extends React.Component {
                             className='canvas'>
                         </canvas>
                     </div>
-                    <div className='canvas-fps-wrapper'>
-                        <input onChange={changeFps} value={fps} type='range' min='1' max='30' step='1'></input>
-                        <label>current fps: {fps}</label>
+                </div>
+                <div className='canvas-buttons-wrapper'>
+                    <div className='canvas-buttons1'>
+                        <SButton text='add' onClick={addFrame}/>
+                        <SButton text='animate' onClick={animate}/>
+                        <div className='canvas-fps-wrapper'>
+                            <input
+                                onChange={changeFps}
+                                value={fps}
+                                type='range'
+                                min='1'
+                                max='30'
+                                step='1'>
+                            </input>
+                            <label>current fps: {fps}</label>
+                        </div>
+                        <div className='get-image'>
+                            <SButton text='get gif' onClick={createGif} />
+                            {
+                                downLoadLink
+                            }
+                        </div>
+                    </div>
+                    <div className='canvas-buttons2'>
+                        <SButton text='delete' onClick={useFrameFunction(deleteFrame)}/>
+                        <SButton text='duplicate' onClick={useFrameFunction(duplicateFrame)}/>
+                        <SButton text='redact' onClick={useFrameFunction(drawFrame)}/>
+                        <SButton text='get image' onClick={useFrameFunction(getImageFromFrame)}/>
                     </div>
                 </div>
+                <div className='canvas-frames'>
+                        <Frames
+                            showContextMenu={showContextMenu}
+                            closeContextMenu={closeContextMenu}
+                            swapFrames={swapFrames}
+                            frames={frames}
+                            focusFrame={focusFrame}
+                        />
+                    </div>
             </section>
         )
     }

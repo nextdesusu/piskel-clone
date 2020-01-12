@@ -6,12 +6,12 @@
 }
 
 .frames-items {
-    height: 20em;
-    overflow-y: scroll;
-    margin-top: 1em;
-    display: grid;
-    grid-auto-rows: 1fr;
-    grid-gap: 1em;
+    height: 12em;
+    width: 32em;
+    display: flex;
+    overflow-y: hidden;
+    overflow-x: scroll;
+    align-items: center;
 }
 
 .frame-wrapper, .frame {
@@ -22,19 +22,14 @@
     cursor: pointer;
 }
 
-.frame-action {
-    width: 8em;
-    height: 8em;
-    background-color: rgba(0, 0, 0, 0);
-    box-shadow: 1px 1px 1px 3px;
-}
-
 .frame-wrapper {
     background-color: rgb(116, 116, 240);
+    margin-right: 1em;
 }
 
-.frame-action, .frame {
+.frame {
     z-index: 100;
+    border: 2px dotted gray;
 }
 
 .highlited {

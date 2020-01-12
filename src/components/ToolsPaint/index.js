@@ -1,6 +1,7 @@
 import React from 'react';
 import './ToolsPaint.css';
 import { ToolsItem, ColorItem } from '../Items';
+import { SInput } from '../Elements';
 import {
     COLOR_PICKER_SIZE,
     BUCKET_TOOL,
@@ -155,15 +156,12 @@ export default class ToolsPaint extends React.Component {
                             className='color-picker'
                         >
                         </canvas>
-                        <input
-                            className='color-slider'
-                            onMouseUp={silderOnChange}
+                        <SInput
+                            onChange={silderOnChange}
                             min='0'
                             max='359'
                             step='1'
-                            type='range'
-                        >    
-                        </input>
+                        />
                     </div>
                 </div>
             </section>

@@ -1,5 +1,4 @@
 import React from 'react';
-import { SButton } from '../Elements';
 import './Frames.css';
 
 export default class Frames extends React.Component {
@@ -7,7 +6,6 @@ export default class Frames extends React.Component {
         super(props);
         this.state = {
             dragged: null,
-            focusedFrameId: null,
         }
     }
 
@@ -52,11 +50,11 @@ export default class Frames extends React.Component {
 
     highliteFrame = (event) => {
         const { target } = event;
+        const { focusFrame } = this.props;
         const id = target.getAttribute('data-id');
         if (id === null) return;
         target.classList.add('highlited');
-        console.log('highliting id:', Number(id));
-        this.setState({ focusedFrameId: Number(id) });
+        focusFrame(id);
     }
 
     unhighliteFrame = (event) => {
@@ -81,17 +79,7 @@ export default class Frames extends React.Component {
         const {
             frames,
             showContextMenu,
-            deleteFrame,
-            duplicateFrame,
-            drawFrame,
-            getImageFromFrame,
-            addFrame
         } = props;
-        const { focusedFrameId } = state;
-        const useFrameFunction = (func) => () => {
-            this.setState({ focusedFrameId: null});
-            func(focusedFrameId);
-        }
         return (
             <div
                 onClick={focusFrame}
@@ -106,13 +94,6 @@ export default class Frames extends React.Component {
                 onDrop={onDrop}
                 className='frames-wrapper'
             >
-                <div className='frames-buttons'>
-                    <SButton text='add' onClick={addFrame}/>
-                    <SButton text='delete' onClick={useFrameFunction(deleteFrame)}/>
-                    <SButton text='duplicate' onClick={useFrameFunction(duplicateFrame)}/>
-                    <SButton text='redact' onClick={useFrameFunction(drawFrame)}/>
-                    <SButton text='get image' onClick={useFrameFunction(getImageFromFrame)}/>
-                </div>
                 <div className='frames-items'>
                     {
                         frames.map((frameData, id) => {

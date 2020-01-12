@@ -1,4 +1,6 @@
 import React from 'react';
+import './ToolsResolution.css';
+import { SButton, SInput } from '../Elements';
 import { ToolsItem } from '../Items';
 
 export default class ToolsResolution extends React.Component {
@@ -89,8 +91,8 @@ export default class ToolsResolution extends React.Component {
                         />
                     </ul>
                 </div>
-                <div>
-                    <input
+                <div className='tools-inputs'>
+                    <SInput
                         value={inputWidth}
                         step='4'
                         type='range'
@@ -99,11 +101,11 @@ export default class ToolsResolution extends React.Component {
                         onChange={onResChange}
                         id={widthChangeId}
                         placeholder='set width'
-                        name='custom-reslotuion'>
-                    </input>
-                    <label htmlFor='custom-reslotuion'>width: {inputWidth}</label>
+                        name='custom-reslotuion'
+                    />
+                    <label className='input-header' htmlFor='custom-reslotuion'>width: {inputWidth}</label>
                     <br></br>
-                    <input
+                    <SInput
                         value={inputHeight}
                         step='4'
                         type='range'
@@ -111,12 +113,11 @@ export default class ToolsResolution extends React.Component {
                         min={minRes}
                         onChange={onResChange}
                         id={heightChangeId}
-                        placeholder='set height'
-                        name='custom-reslotuion'>
-                    </input>
-                    <label htmlFor='custom-reslotuion'>height: {inputHeight}</label>
+                        name='custom-reslotuion'
+                    />
+                    <label className='input-header' htmlFor='custom-reslotuion'>height: {inputHeight}</label>
                     <br></br>
-                    <button onClick={onResSubmit}>set resolution</button>
+                    <SButton text='set resolution' onClick={onResSubmit}/>
                 </div>
             </section>
         )
